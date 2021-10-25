@@ -2,10 +2,8 @@
 
 namespace Runroom\GildedRose;
 
-use Runroom\GildedRose\Classes\AgedBrie;
-use Runroom\GildedRose\Classes\Backstage;
-use Runroom\GildedRose\Classes\DefaultClass;
-use Runroom\GildedRose\Classes\Sulfuras;
+use Runroom\GildedRose\Classes\ProductBuilder;
+use Runroom\GildedRose\Classes\QualityAbstract;
 
 class GildedRose
 {
@@ -20,25 +18,13 @@ class GildedRose
     public function update_quality()
     {
         foreach ($this->items as $item) {
-            $this->setUpdateQuality($item);
+            $strategy = ProductBuilder::build($item);
+            $this->setUpdateQuality($item, $strategy);
         }
     }
 
-    protected function setUpdateQuality($item)
+    protected function setUpdateQuality($item, QualityAbstract $strategy)
     {
-        switch ($item->name) {
-            case 'Aged Brie':
-                (new AgedBrie())->update($item);
-                break;
-            case 'Backstage passes to a TAFKAL80ETC concert':
-                (new Backstage())->update($item);
-                break;
-            case 'Sulfuras, Hand of Ragnaros':
-                (new Sulfuras())->update($item);
-                break;
-            default:
-                (new DefaultClass())->update($item);
-                break;
-        }
+        $strategy->update($item);
     }
 }
