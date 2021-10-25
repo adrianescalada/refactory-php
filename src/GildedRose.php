@@ -2,61 +2,72 @@
 
 namespace Runroom\GildedRose;
 
-class GildedRose {
+class GildedRose
+{
 
     private $items;
 
-    function __construct($items) {
+    public function __construct($items)
+    {
         $this->items = $items;
     }
 
-    function update_quality() {
+    public function update_quality()
+    {
         foreach ($this->items as $item) {
-            if ($item->name != 'Aged Brie' and $item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                if ($item->quality > 0) {
-                    if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                        $item->quality = $item->quality - 1;
-                    }
-                }
-            } else {
-                if ($item->quality < 50) {
-                    $item->quality = $item->quality + 1;
-                    if ($item->name == 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->sell_in < 11) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                        if ($item->sell_in < 6) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                $item->sell_in = $item->sell_in - 1;
-            }
-
-            if ($item->sell_in < 0) {
-                if ($item->name != 'Aged Brie') {
-                    if ($item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->quality > 0) {
-                            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                                $item->quality = $item->quality - 1;
-                            }
-                        }
-                    } else {
-                        $item->quality = $item->quality - $item->quality;
-                    }
-                } else {
-                    if ($item->quality < 50) {
-                        $item->quality = $item->quality + 1;
-                    }
-                }
-            }
+            $this->setUpdateQuality($item);
         }
+    }
+
+    protected function setUpdateQuality($item)
+    {
+        switch ($item->name) {
+            case 'Aged Brie':
+                if ($item->quality < 50) {
+                    $this->increaseQuality($item);
+                }
+                $item->sell_in = $item->sell_in - 1;
+                if ($item->sell_in < 0 && $item->quality < 50) {
+                    $this->increaseQuality($item);
+                }
+                break;
+            case 'Backstage passes to a TAFKAL80ETC concert':
+                if ($item->quality < 50) {
+                    $this->increaseQuality($item);
+                }
+                if ($item->sell_in < 11 && $item->quality < 50) {
+                    $this->increaseQuality($item);
+                }
+                if ($item->sell_in < 6 && $item->quality < 50) {
+                    $this->increaseQuality($item);
+                }
+                $item->sell_in = $item->sell_in - 1;
+                if ($item->sell_in < 0) {
+                    $item->quality = 0;
+                }
+                break;
+            case 'Sulfuras, Hand of Ragnaros':
+
+                break;
+            default:
+                if ($item->quality > 0) {
+                    $this->decreaseQuality($item);
+                }
+                $item->sell_in = $item->sell_in - 1;
+                if ($item->sell_in < 0 && $item->quality > 0) {
+                    $this->decreaseQuality($item);
+                }
+                break;
+        }
+    }
+
+    protected function increaseQuality($item): void
+    {
+        $item->quality = $item->quality + 1;
+    }
+
+    protected function decreaseQuality($item): void
+    {
+        $item->quality = $item->quality - 1;
     }
 }
