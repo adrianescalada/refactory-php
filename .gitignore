@@ -1,5 +1,6 @@
 coverage
 vendor
-
+.vscode
 phpunit.xml
 composer.lock
+.phpunit.result.cache
